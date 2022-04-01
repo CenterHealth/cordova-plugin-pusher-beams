@@ -2,7 +2,7 @@
 
 @import PushNotifications;
 
-#pragma mark _
+#pragma mark -
 #pragma mark PusherBeams
 
 @implementation PusherBeams
