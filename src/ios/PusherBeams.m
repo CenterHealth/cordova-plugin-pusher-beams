@@ -10,7 +10,7 @@
 
 - (void)setUserId:(CDVInvokedUrlCommand*)command {
   [self.commandDelegate runInBackground:^{
-    NSError *anyError
+    NSError *anyError;
     [[PushNotifications shared] addDeviceInterestWithInterest:@"debug-hello" error:&anyError];
   }];
 
@@ -21,8 +21,30 @@
 
 - (void)getRegistrationState:(CDVInvokedUrlCommand*)command {
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    [center getNotificationSettingsWithCompletionHandler: ^(UNNotificationSettings *settings){
-        return settings.authorizationStatus;
+    [center getNotificationSettingsWithCompletionHandler: ^(UNNotificationSettings * _Nonnull settings){
+
+    //1. Query the authorization status of the UNNotificationSettings object
+      switch (settings.authorizationStatus) {
+        case UNAuthorizationStatusAuthorized:
+          NSLog(@"Status Authorized");
+          break;
+        case UNAuthorizationStatusDenied:
+          NSLog(@"Status Denied");
+          break;
+        case UNAuthorizationStatusNotDetermined:
+          NSLog(@"Undetermined");
+          break;
+        default:
+        break;
+    }
+
+
+    //2. To learn the status of specific settings, query them directly
+    NSLog(@"Checking Badge settings");
+    if (settings.badgeSetting == UNAuthorizationStatusAuthorized)
+    NSLog(@"Yeah. We can badge this puppy!");
+    else
+    NSLog(@"Not authorized");
     }];
 }
 
@@ -32,7 +54,7 @@
 
         NSString *instanceId = [command argumentAtIndex:0];
 
-        [[PushNotifications shared] startWithInstanceId:@"%@",instanceId];
+        [[PushNotifications shared] startWithInstanceId:instanceId];
         [[PushNotifications shared] registerForRemoteNotifications];
     }];
 

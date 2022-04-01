@@ -17,4 +17,4 @@ const PusherBeamsCDV = {
   },
 };
 
-export default PusherBeamsCDV;
+module.exports = PusherBeamsCDV;
