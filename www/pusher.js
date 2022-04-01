@@ -1,10 +1,20 @@
 /*global cordova, module*/
 
-module.exports = {
-    registerUserId: function (tokenUrl, userId, authToken, successCallback, errorCallback) {
-        cordova.exec(successCallback, errorCallback, "PusherBeams", "registerUserId", [tokenUrl, userId, authToken]);
-    },
-    clear: function(successCallback, errorCallback) {
-        cordova.exec(successCallback, errorCallback, "PusherBeams", "clear", []);
-    }
+const PusherBeamsCDV = {
+  getRegistrationState: (successCb, errorCb) => {
+    cordova.exec(successCb, errorCb, "PusherBeams", "getRegistrationState", []);
+  },
+
+  start: (instanceId, successCb, errorCb) => {
+    cordova.exec(successCb, errorCb, "PusherBeams", "start", [instanceId]);
+  },
+
+  setUserId: (userId, successCb, errorCb) => {
+    cordova.exec(successCb, errorCb, "PusherBeams", "setUserId", [userId]);
+  },
+  clear: (successCb, errorCb) => {
+    cordova.exec(successCb, errorCb, "PusherBeams", "clear", []);
+  },
 };
+
+export default PusherBeamsCDV;

@@ -1,26 +1,47 @@
 #import "PusherBeams.h"
 
 @import PushNotifications;
+@import UserNotifications;
 
 #pragma mark -
 #pragma mark PusherBeams
 
 @implementation PusherBeams
 
-- (void)registerUserId:(CDVInvokedUrlCommand*)command {
-  NSLog(@"registerUserId starting");
+- (void)setUserId:(CDVInvokedUrlCommand*)command {
   [self.commandDelegate runInBackground:^{
-    // if using one instance id throughout the whole app do the following:
-    [[PushNotifications shared] startWithInstanceId:@"73f408d7-80a4-4986-a105-7be1f7081dbc"]; // Can be found here: https://dash.pusher.com
-    [[PushNotifications shared] registerForRemoteNotifications];
-    NSError *anyError;
+    NSError *anyError
     [[PushNotifications shared] addDeviceInterestWithInterest:@"debug-hello" error:&anyError];
   }];
+
+  NSLog(@"setUserId completed");
+  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)getRegistrationState:(CDVInvokedUrlCommand*)command {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center getNotificationSettingsWithCompletionHandler: ^(UNNotificationSettings *settings){
+        return settings.authorizationStatus;
+    }];
+}
+
+// Start instance and registerForRemoteNotifications
+- (void)start:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+
+        NSString *instanceId = [command argumentAtIndex:0];
+
+        [[PushNotifications shared] startWithInstanceId:@"%@",instanceId];
+        [[PushNotifications shared] registerForRemoteNotifications];
+    }];
+
   NSLog(@"registerForRemoteNotifications completed");
   CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
+// Clear all states
 - (void)clear:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
         [PushNotificationsStatic clearAllStateWithCompletion:^{}];
@@ -28,5 +49,4 @@
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
-
 @end
