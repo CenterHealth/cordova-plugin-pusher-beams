@@ -19,6 +19,7 @@
   NSLog(@"registerForRemoteNotifications completed");
   CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
   [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
 
 - (void)clear:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
