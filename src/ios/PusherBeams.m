@@ -27,12 +27,15 @@
       switch (settings.authorizationStatus) {
         case UNAuthorizationStatusAuthorized:
           NSLog(@"Status Authorized");
+          return 'OKKK';
           break;
         case UNAuthorizationStatusDenied:
           NSLog(@"Status Denied");
+          return 'Test'
           break;
         case UNAuthorizationStatusNotDetermined:
           NSLog(@"Undetermined");
+          return 'Test2';
           break;
         default:
         break;
