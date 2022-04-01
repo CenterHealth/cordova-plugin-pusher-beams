@@ -41,9 +41,9 @@
         default:
         break;
       }
-    }];
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:authResult];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
 }
 
 // Start instance and registerForRemoteNotifications
