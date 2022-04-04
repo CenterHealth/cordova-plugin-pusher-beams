@@ -65,7 +65,7 @@
 // Start instance and registerForRemoteNotifications
 - (void)start:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
-
+        NSLog(@"beams starting");
         NSString *instanceId = [command argumentAtIndex:0];
 
         [[PushNotifications shared] startWithInstanceId:instanceId];
