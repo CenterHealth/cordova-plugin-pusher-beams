@@ -9,30 +9,26 @@
 @implementation PusherBeams
 
 - (void)setUserId:(CDVInvokedUrlCommand*)command {
-    [self.commandDelegate runInBackground:^{
-        NSString *tokenUrl = [command argumentAtIndex:0];
-        NSString *userId = [command argumentAtIndex:1];
-        if ([userId isEqualToString:@"null"]) {
-            //dont register yet - there is no userid
-            return;
-        }
-        NSString *authToken= [command argumentAtIndex:2];
-        NSString *bearerToken = [NSString stringWithFormat:@"Bearer %@", authToken];
-        BeamsTokenProvider *tokenProvider = [[BeamsTokenProvider alloc] initWithAuthURL:tokenUrl getAuthData:^AuthData *{
-            NSDictionary *headers = @{
-                @"Authorization" : bearerToken
-            };
-            AuthData *toRet = [[AuthData alloc] initWithHeaders:headers queryParams:@{}];
-            return toRet;
-        }];
-        [PushNotificationsStatic setUserId:userId tokenProvider:tokenProvider completion:^(NSError *error) {
-            if (error != nil) {
-                NSLog(@"%@", error);
-            }
-        }];
-    }];
+  BeamsTokenProvider *beamsTokenProvider = [[BeamsTokenProvider alloc] initWithAuthURL:[command argumentAtIndex:0] getAuthData:^AuthData * _Nonnull{
+  NSString *sessionToken = [command argumentAtIndex:2];
+  NSString *userId = [command argumentAtIndex:1];
+  NSDictionary *headers = @{@"Authorization": [NSString stringWithFormat:@"Bearer %@", sessionToken]}; // Headers your auth endpoint needs
+  NSDictionary *queryParams = @{@"user_id": userId}; // URL query params your auth endpoint needs
+
+  return [[AuthData alloc] initWithHeaders:headers queryParams:queryParams];
+}];
+
+[[PushNotifications shared] setUserId:userId tokenProvider:beamsTokenProvider completion:^(NSError * _Nullable anyError) {
+  if (anyError) {
+      NSLog(@"Error: %@", anyError);
+  }
+  else {
+      NSLog(@"Successfully authenticated with Pusher Beams");
+  }
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+
+}];
 }
 
 - (void)getRegistrationState:(CDVInvokedUrlCommand*)command {
