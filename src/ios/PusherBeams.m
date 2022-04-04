@@ -70,11 +70,10 @@
 
         [[PushNotifications shared] startWithInstanceId:instanceId];
         [[PushNotifications shared] registerForRemoteNotifications];
+        NSLog(@"registerForRemoteNotifications completed");
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
-
-  NSLog(@"registerForRemoteNotifications completed");
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 // Clear all states
