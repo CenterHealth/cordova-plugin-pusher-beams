@@ -9,9 +9,14 @@ const PusherBeamsCDV = {
     cordova.exec(successCb, errorCb, "PusherBeams", "start", [instanceId]);
   },
 
-  setUserId: (userId, successCb, errorCb) => {
-    cordova.exec(successCb, errorCb, "PusherBeams", "setUserId", [userId]);
+  setUserId: (tokenUrl, userId, authToken, successCb, errorCb) => {
+    cordova.exec(successCb, errorCb, "PusherBeams", "setUserId", [
+      tokenUrl,
+      userId,
+      authToken,
+    ]);
   },
+
   clear: (successCb, errorCb) => {
     cordova.exec(successCb, errorCb, "PusherBeams", "clear", []);
   },
