@@ -11,14 +11,13 @@
 - (void)setUserId:(CDVInvokedUrlCommand*)command {
   BeamsTokenProvider *beamsTokenProvider = [[BeamsTokenProvider alloc] initWithAuthURL:[command argumentAtIndex:0] getAuthData:^AuthData * _Nonnull{
   NSString *sessionToken = [command argumentAtIndex:2];
-  NSString *userId = [command argumentAtIndex:1];
   NSDictionary *headers = @{@"Authorization": [NSString stringWithFormat:@"Bearer %@", sessionToken]}; // Headers your auth endpoint needs
-  NSDictionary *queryParams = @{@"user_id": userId}; // URL query params your auth endpoint needs
+  NSDictionary *queryParams = @{}; // URL query params your auth endpoint needs
 
   return [[AuthData alloc] initWithHeaders:headers queryParams:queryParams];
 }];
 
-[[PushNotifications shared] setUserId:userId tokenProvider:beamsTokenProvider completion:^(NSError * _Nullable anyError) {
+[[PushNotifications shared] setUserId:[command argumentAtIndex:1] tokenProvider:beamsTokenProvider completion:^(NSError * _Nullable anyError) {
   if (anyError) {
       NSLog(@"Error: %@", anyError);
   }
