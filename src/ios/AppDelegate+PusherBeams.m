@@ -26,12 +26,11 @@
     didReceiveRemoteNotification:(NSDictionary *)userInfo
           fetchCompletionHandler:
               (void (^)(UIBackgroundFetchResult))completionHandler {
-  NSLog(@"COMING");
   [[PusherBeams pusherBeams] setNotification:userInfo];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-  NSLog(@"notifications cleared");
+  [[PusherBeams pusherBeams] clearNotification];
 }
 
 @end
