@@ -6,6 +6,11 @@
 #pragma mark -
 #pragma mark PusherBeams
 
+@interface PusherBeams : CDVPlugin <UNUserNotificationCenterDelegate, UIApplicationDelegate> {
+}
+
+@end
+
 @implementation PusherBeams
 
 - (void)setUserId:(CDVInvokedUrlCommand*)command {
@@ -79,4 +84,37 @@
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
+
+- (void)getNotification:(CDVInvokedUrlCommand*)command {
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:self.notification];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+- (void)setNotification:(NSString*)userInfo {
+  self.notification = userInfo;
+}
+
+-(void)clearNotification {
+  self.notification = nil;  
+}
+
+
+- (void) userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
+
+    //Here you can get your original push if you need to
+    NSDictionary* pusDict = response.notification.request.content.userInfo;
+    NSLog(pusDict);
+    if ([response.actionIdentifier isEqualToString: UNNotificationDefaultActionIdentifier]) {
+        NSLog(@'usertapped');
+        //User tapped the notification
+    } else if ([response.actionIdentifier isEqualToString: UNNotificationDismissActionIdentifier]) {
+        //User dismissed the 
+        
+        NSLog(@'dismessed'); 
+    } else if ([response.actionIdentifier isEqualToString: MYCustomActionId]) {
+        NSLog(@'action?');
+    }
+}
+
 @end

@@ -18,4 +18,9 @@
    NSLog(@"%@", userInfo);
 }
 
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    [PusherBeams.pusherBeams clearNotification];
+    NSLog(@"notifications cleared");
+}
+
 @end
