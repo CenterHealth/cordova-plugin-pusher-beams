@@ -20,6 +20,11 @@ const PusherBeamsCDV = {
   clear: (successCb, errorCb) => {
     cordova.exec(successCb, errorCb, "PusherBeams", "clear", []);
   },
+
+  getNotification: (successCb, errorCb) => {
+    cordova.exec(successCb, errorCb, "PusherBeams", "getNotification", []);
+  },
+
 };
 
 module.exports = PusherBeamsCDV;

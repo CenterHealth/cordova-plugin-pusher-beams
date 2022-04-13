@@ -6,115 +6,126 @@
 #pragma mark -
 #pragma mark PusherBeams
 
-@interface PusherBeams : CDVPlugin <UNUserNotificationCenterDelegate, UIApplicationDelegate> {
-}
-
-@end
-
 @implementation PusherBeams
 
-- (void)setUserId:(CDVInvokedUrlCommand*)command {
-  BeamsTokenProvider *beamsTokenProvider = [[BeamsTokenProvider alloc] initWithAuthURL:[command argumentAtIndex:0] getAuthData:^AuthData * _Nonnull{
-  NSString *sessionToken = [command argumentAtIndex:2];
-  NSDictionary *headers = @{@"Authorization": [NSString stringWithFormat:@"Bearer %@", sessionToken]}; // Headers your auth endpoint needs
-  NSDictionary *queryParams = @{}; // URL query params your auth endpoint needs
+static NSDictionary *notification; // used for Apple Sign In
+static PusherBeams *pusherBeams;
 
-  return [[AuthData alloc] initWithHeaders:headers queryParams:queryParams];
-}];
-
-[[PushNotifications shared] setUserId:[command argumentAtIndex:1] tokenProvider:beamsTokenProvider completion:^(NSError * _Nullable anyError) {
-  if (anyError) {
-      NSLog(@"Error: %@", anyError);
-  }
-  else {
-      NSLog(@"Successfully authenticated with Pusher Beams");
-  }
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-
-}];
++ (PusherBeams *)pusherBeams {
+  return pusherBeams;
 }
 
-- (void)getRegistrationState:(CDVInvokedUrlCommand*)command {
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+- (void)pluginInitialize {
+  NSLog(@"Starting Firebase plugin");
+  pusherBeams = self;
+}
 
-    __block NSString *authResult;
-    [center getNotificationSettingsWithCompletionHandler: ^(UNNotificationSettings * _Nonnull settings){
+- (void)setUserId:(CDVInvokedUrlCommand *)command {
+  BeamsTokenProvider *beamsTokenProvider = [[BeamsTokenProvider alloc]
+      initWithAuthURL:[command argumentAtIndex:0]
+          getAuthData:^AuthData *_Nonnull {
+            NSString *sessionToken = [command argumentAtIndex:2];
+            NSDictionary *headers = @{
+              @"Authorization" :
+                  [NSString stringWithFormat:@"Bearer %@", sessionToken]
+            }; // Headers your auth endpoint needs
+            NSDictionary *queryParams =
+                @{}; // URL query params your auth endpoint needs
 
-      switch (settings.authorizationStatus) {
-        case UNAuthorizationStatusAuthorized:
-          NSLog(@"Status Authorized");
-          authResult=@"Authorized";
-          break;
-        case UNAuthorizationStatusDenied:
-          NSLog(@"Status Denied");
-          authResult=@"Denied";
-          break;
-        case UNAuthorizationStatusNotDetermined:
-          NSLog(@"Undetermined");
-          authResult=@"Undetermined";
-          break;
-        default:
-        break;
-      }
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:authResult];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-    }];
+            return [[AuthData alloc] initWithHeaders:headers
+                                         queryParams:queryParams];
+          }];
+
+  [[PushNotifications shared]
+          setUserId:[command argumentAtIndex:1]
+      tokenProvider:beamsTokenProvider
+         completion:^(NSError *_Nullable anyError) {
+           if (anyError) {
+             NSLog(@"Error: %@", anyError);
+           } else {
+             NSLog(@"Successfully authenticated with Pusher Beams");
+           }
+           CDVPluginResult *result =
+               [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+           [self.commandDelegate sendPluginResult:result
+                                       callbackId:command.callbackId];
+         }];
+}
+
+- (void)getRegistrationState:(CDVInvokedUrlCommand *)command {
+  UNUserNotificationCenter *center =
+      [UNUserNotificationCenter currentNotificationCenter];
+
+  __block NSString *authResult;
+  [center getNotificationSettingsWithCompletionHandler:^(
+              UNNotificationSettings *_Nonnull settings) {
+    switch (settings.authorizationStatus) {
+    case UNAuthorizationStatusAuthorized:
+      NSLog(@"Status Authorized");
+      authResult = @"Authorized";
+      break;
+    case UNAuthorizationStatusDenied:
+      NSLog(@"Status Denied");
+      authResult = @"Denied";
+      break;
+    case UNAuthorizationStatusNotDetermined:
+      NSLog(@"Undetermined");
+      authResult = @"Undetermined";
+      break;
+    default:
+      break;
+    }
+    CDVPluginResult *result =
+        [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                          messageAsString:authResult];
+    [self.commandDelegate sendPluginResult:result
+                                callbackId:command.callbackId];
+  }];
 }
 
 // Start instance and registerForRemoteNotifications
-- (void)start:(CDVInvokedUrlCommand*)command {
-    [self.commandDelegate runInBackground:^{
-        NSLog(@"beams starting");
-        NSString *instanceId = [command argumentAtIndex:0];
+- (void)start:(CDVInvokedUrlCommand *)command {
+  [self.commandDelegate runInBackground:^{
+    NSLog(@"beams starting");
+    NSString *instanceId = [command argumentAtIndex:0];
 
-        [[PushNotifications shared] startWithInstanceId:instanceId];
-        [[PushNotifications shared] registerForRemoteNotifications];
-        NSLog(@"registerForRemoteNotifications completed");
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-    }];
+    [[PushNotifications shared] startWithInstanceId:instanceId];
+    [[PushNotifications shared] registerForRemoteNotifications];
+    NSLog(@"registerForRemoteNotifications completed");
+    CDVPluginResult *result =
+        [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result
+                                callbackId:command.callbackId];
+  }];
 }
 
 // Clear all states
-- (void)clear:(CDVInvokedUrlCommand*)command {
-    [self.commandDelegate runInBackground:^{
-        [PushNotificationsStatic clearAllStateWithCompletion:^{}];
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+- (void)clear:(CDVInvokedUrlCommand *)command {
+  [self.commandDelegate runInBackground:^{
+    [PushNotificationsStatic clearAllStateWithCompletion:^{
     }];
+    CDVPluginResult *result =
+        [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result
+                                callbackId:command.callbackId];
+  }];
 }
 
-- (void)getNotification:(CDVInvokedUrlCommand*)command {
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:self.notification];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-    }];
+- (void)getNotification:(CDVInvokedUrlCommand *)command {
+  CDVPluginResult *result =
+      [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                    messageAsDictionary:notification];
+  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
-- (void)setNotification:(NSString*)userInfo {
-  self.notification = userInfo;
+- (void)setNotification:(NSDictionary *)userInfo {
+  notification = userInfo;
+  return;
 }
 
--(void)clearNotification {
-  self.notification = nil;  
-}
-
-
-- (void) userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-
-    //Here you can get your original push if you need to
-    NSDictionary* pusDict = response.notification.request.content.userInfo;
-    NSLog(pusDict);
-    if ([response.actionIdentifier isEqualToString: UNNotificationDefaultActionIdentifier]) {
-        NSLog(@'usertapped');
-        //User tapped the notification
-    } else if ([response.actionIdentifier isEqualToString: UNNotificationDismissActionIdentifier]) {
-        //User dismissed the 
-        
-        NSLog(@'dismessed'); 
-    } else if ([response.actionIdentifier isEqualToString: MYCustomActionId]) {
-        NSLog(@'action?');
-    }
+- (void)clearNotification {
+  notification = nil;
+  return;
 }
 
 @end
