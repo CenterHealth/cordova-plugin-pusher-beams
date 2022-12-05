@@ -37,10 +37,10 @@
       </feature>
   </config-file>
 
-    <header-file src="src/ios/AppDelegate+PusherBeams.h" target-dir="PusherPlugin"/>
-	  <source-file src="src/ios/AppDelegate+PusherBeams.m" target-dir="PusherPlugin"/>
-    <header-file src="src/ios/PusherBeams.h" target-dir="PusherPlugin"/>
-    <source-file src="src/ios/PusherBeams.m" target-dir="PusherPlugin"/>
+    <header-file src="src/ios/AppDelegate+PusherBeams.h"/>
+	  <source-file src="src/ios/AppDelegate+PusherBeams.m"/>
+    <header-file src="src/ios/PusherBeams.h"/>
+    <source-file src="src/ios/PusherBeams.m"/>
 
      <podspec>
             <config>
